@@ -1,9 +1,10 @@
-import axios from 'axios';
-import FormData from "form-data";
-import { Buffer } from 'buffer';
+const axios = require("axios");
+const FormData = require("form-data");
+const { Buffer } = require("buffer");
 
 
-export  const handler = async function(event) {
+
+module.exports.handler = async function(event) { 
   try {
     const { target, payload, filename } = JSON.parse(event.body);
 
