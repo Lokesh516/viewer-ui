@@ -50,17 +50,26 @@ async function proxyJson(url, data) {
   };
 }
 
+// ⬇️ Helper for file upload
 async function proxyForm(url, base64File, filename) {
-  const buffer = Buffer.from(base64File, "base64");
-  const form = new FormData();
-  form.append("pdf", buffer, filename);
+  try {
+    const buffer = Buffer.from(base64File, "base64");
+    const form = new FormData();
+    form.append("pdf", buffer, filename);
 
-  const response = await axios.post(url, form, {
-    headers: form.getHeaders()
-  });
+    const response = await axios.post(url, form, {
+      headers: form.getHeaders()
+    });
 
-  return {
-    statusCode: 200,
-    body: JSON.stringify(response.data)
-  };
+    return {
+      statusCode: 200,
+      body: JSON.stringify(response.data)
+    };
+  } catch (err) {
+    console.log("Upload failed:", err.message);
+    return {
+      statusCode: 502,
+      body: JSON.stringify({ error: err.message })
+    };
+  }
 }
