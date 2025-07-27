@@ -3,13 +3,13 @@ const FormData = require("form-data");
 const { Buffer } = require("buffer");
 
 module.exports.handler = async function (event) {
-  console.log("📩 Step 1: Received event");
+  console.log("📩 Received event");
 
   let bodyData;
   try {
-    console.log("📦 Step 2: Parsing request body...");
+    console.log("📦 Parsing request body...");
     bodyData = JSON.parse(event.body);
-    console.log("✅ Parsed body:", bodyData);
+    console.log("✅ Body parsed:", bodyData);
   } catch (err) {
     console.log("❌ JSON parsing error:", err.message);
     return {
@@ -19,10 +19,10 @@ module.exports.handler = async function (event) {
   }
 
   const { target, payload, filename } = bodyData;
-  console.log(`🎯 Step 3: Target = ${target}`);
+  console.log(`🎯 Routing target: ${target}`);
 
   if (!target) {
-    console.log("❌ Missing target identifier.");
+    console.log("❌ Missing target key");
     return {
       statusCode: 400,
       body: JSON.stringify({ error: "Missing target API identifier." })
@@ -32,17 +32,17 @@ module.exports.handler = async function (event) {
   try {
     switch (target) {
       case "ask":
-        console.log("🚀 Step 4: Routing to proxyJson - ask");
+        console.log("➡️ Proxying to ask.php");
         return await proxyJson("https://smartview.iceiy.com/ask.php", payload);
 
       case "build":
-        console.log("🚀 Step 4: Routing to proxyJson - build");
+        console.log("➡️ Proxying to build_pdf_context.php");
         return await proxyJson("https://smartview.iceiy.com/build_pdf_context.php", payload);
 
       case "upload":
-        console.log("🚀 Step 4: Routing to proxyForm - upload");
+        console.log("➡️ Proxying to upload.php");
         if (!payload?.file) {
-          console.log("❌ File missing in payload.");
+          console.log("❌ No file found in payload");
           return {
             statusCode: 400,
             body: JSON.stringify({ error: "Missing file in payload." })
@@ -58,7 +58,7 @@ module.exports.handler = async function (event) {
         };
     }
   } catch (err) {
-    console.log("🔥 Runtime error:", err.message);
+    console.log("🔥 Internal error:", err.message);
     return {
       statusCode: 500,
       body: JSON.stringify({ error: err.message })
@@ -68,14 +68,14 @@ module.exports.handler = async function (event) {
 
 async function proxyJson(url, data) {
   try {
-    console.log(`🔗 proxyJson: Posting to ${url}`);
-    console.log("📤 Payload:", data);
+    console.log("🔗 proxyJson →", url);
+    console.log("📤 Payload:", JSON.stringify(data));
 
     const response = await axios.post(url, data, {
       headers: { "Content-Type": "application/json" }
     });
 
-    console.log("✅ Response received:", response.data);
+    console.log("✅ Response from API:", response.data);
     return {
       statusCode: 200,
       body: JSON.stringify(response.data)
@@ -91,26 +91,26 @@ async function proxyJson(url, data) {
 
 async function proxyForm(url, base64File, filename) {
   try {
-    console.log(`🔗 proxyForm: Uploading to ${url}`);
+    console.log("🔗 proxyForm →", url);
     console.log("📄 Filename:", filename);
-    console.log("📏 File length:", base64File.length);
+    console.log("📏 Base64 length:", base64File.length);
 
     const buffer = Buffer.from(base64File, "base64");
     const form = new FormData();
     form.append("pdf", buffer, filename);
 
-    console.log("📤 Sending form data...");
+    console.log("📤 Sending form...");
     const response = await axios.post(url, form, {
       headers: form.getHeaders()
     });
 
-    console.log("✅ Upload successful:", response.data);
+    console.log("✅ Upload response:", response.data);
     return {
       statusCode: 200,
       body: JSON.stringify(response.data)
     };
   } catch (err) {
-    console.log("❌ Upload failed:", err.message);
+    console.log("❌ Upload error:", err.message);
     return {
       statusCode: 502,
       body: JSON.stringify({ error: err.message })
