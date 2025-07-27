@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import UploadScreen from './components/UploadScreen';
 import ChatScreen from './components/ChatScreen';
 import axios from 'axios';
+import ApiTest from './components/ApiTest';
 
 const App = () => {
   const [isUploading, setIsUploading] = useState(false);
@@ -18,17 +19,22 @@ const App = () => {
     setUploadProgress(0);
 
     try {
+      
       const res = await axios.post(
-        'https://smartview.iceiy.com/upload.php',
-        formData,
-        {
-          headers: { 'Content-Type': 'multipart/form-data' },
-          onUploadProgress: (e) => {
-            const percent = Math.round((e.loaded * 100) / e.total);
-            setUploadProgress(percent);
-          },
-        }
-      );
+  '/.netlify/functions/backendProxy',
+  {
+    target: 'upload',
+    payload: formData
+  },
+  {
+    headers: { 'Content-Type': 'multipart/form-data' },
+    onUploadProgress: (e) => {
+      const percent = Math.round((e.loaded * 100) / e.total);
+      setUploadProgress(percent);
+    },
+  }
+);
+
 
       if (res.data.status === 'success') {
         setUploaded(true);

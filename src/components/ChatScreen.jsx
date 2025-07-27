@@ -15,7 +15,7 @@ const ChatScreen = ({ pdfName, contextData }) => {
   const [pagesToRender, setPagesToRender] = useState([]);
   const pdfContainerRef = useRef(null);
 
-  const pdfFileUrl = `http://localhost/notebooklm-clone/backend/uploads/${encodeURIComponent(pdfName)}`;
+  const pdfFileUrl = `https://smartview.iceiy.com/uploads/uploads/${encodeURIComponent(pdfName)}`;
 
   const onDocumentLoadSuccess = ({ numPages }) => {
     setNumPages(numPages);
@@ -48,10 +48,14 @@ const ChatScreen = ({ pdfName, contextData }) => {
     setInput('');
 
     try {
-      const res = await axios.post('https://smartview.iceiy.com/ask.php', {
-        question: input,
-        file: pdfName
-      });
+      const res = await axios.post('/.netlify/functions/backendProxy', {
+  target: 'ask',
+  payload: {
+    question: input,
+    file: pdfName
+  }
+});
+
 console.log(res)
 
       const aiMessage = {
