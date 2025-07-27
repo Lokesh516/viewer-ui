@@ -2,7 +2,6 @@ import React, { useState } from 'react';
 import UploadScreen from './components/UploadScreen';
 import ChatScreen from './components/ChatScreen';
 import axios from 'axios';
-import ApiTest from './components/ApiTest';
 
 const App = () => {
   const [isUploading, setIsUploading] = useState(false);
