@@ -18,22 +18,17 @@ const App = () => {
     setUploadProgress(0);
 
     try {
-      
       const res = await axios.post(
-  '/.netlify/functions/backendProxy',
-  {
-    target: 'upload',
-    payload: formData
-  },
-  {
-    headers: { 'Content-Type': 'multipart/form-data' },
-    onUploadProgress: (e) => {
-      const percent = Math.round((e.loaded * 100) / e.total);
-      setUploadProgress(percent);
-    },
-  }
-);
-
+        'https://php-file-viewer-1.onrender.com/upload.php',
+        formData,
+        {
+          headers: { 'Content-Type': 'multipart/form-data' },
+          onUploadProgress: (e) => {
+            const percent = Math.round((e.loaded * 100) / e.total);
+            setUploadProgress(percent);
+          },
+        }
+      );
 
       if (res.data.status === 'success') {
         setUploaded(true);
